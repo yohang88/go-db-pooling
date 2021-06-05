@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
@@ -29,7 +30,12 @@ func main() {
 func health(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	fmt.Fprintf(w, "Health OK")
+	hostname, _ := os.Hostname()
+
+	m := make(map[string]interface{})
+	m["server"] = hostname
+    resp, _ := json.Marshal(m)
+	fmt.Fprintf(w, string(resp))
 }
 
 func hello(w http.ResponseWriter, req *http.Request) {
@@ -45,7 +51,13 @@ func hello(w http.ResponseWriter, req *http.Request) {
 
 	defer rows.Close()
 
-	fmt.Fprintf(w, "DB OK")
+	hostname, _ := os.Hostname()
+	m := make(map[string]interface{})
+	m["server"] = hostname
+	m["db"] = "OK"
+
+	resp, _ := json.Marshal(m)
+	fmt.Fprintf(w, string(resp))
 }
 
 func connect() *sql.DB {
